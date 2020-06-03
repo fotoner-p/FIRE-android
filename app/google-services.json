@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "294828453987",
+    "firebase_url": "https://fire-760ed.firebaseio.com",
+    "project_id": "fire-760ed",
+    "storage_bucket": "fire-760ed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:294828453987:android:8e4f37b0e2e2912cb40856",
+        "android_client_info": {
+          "package_name": "moe.fotone.fire"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "294828453987-08efps5lsprun0rb0kkfpds4rpo6vrou.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsVpugM0wzQ-FLs2Tp0A1eg5frdjR9X-o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "294828453987-08efps5lsprun0rb0kkfpds4rpo6vrou.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
