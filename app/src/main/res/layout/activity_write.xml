@@ -15,18 +15,19 @@
         android:layout_marginEnd="8dp"
         android:ems="10"
         android:hint="main"
-        android:inputType="textPersonName"
+        android:inputType="textMultiLine"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/sendBtn"
+        android:id="@+id/sansBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SEND"
+        android:text="SANS"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/writeTextMain" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

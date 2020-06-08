@@ -14,7 +14,7 @@ class WriteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_write)
 
-        sendBtn.setOnClickListener{
+        sansBtn.setOnClickListener{
             val base = FirebaseHelper()
 
             base.createArticle(auth.currentUser!!.uid, writeTextMain.text.toString())
