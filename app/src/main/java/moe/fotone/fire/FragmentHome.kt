@@ -1,21 +1,27 @@
 package moe.fotone.fire
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.fragment_home.*
 import moe.fotone.fire.utils.Article
-import moe.fotone.fire.utils.FirebaseHelper
-
 
 class FragmentHome: Fragment() {
-    private lateinit var articleAdapter: ArticleAdapter
+    private val database by lazy { FirebaseFirestore.getInstance()}
+    private lateinit var articleAdapter: FirestoreRecyclerAdapter<Article, ArticleHolder>
+    private lateinit var firestoreListener: ListenerRegistration
+    private lateinit var lists: MutableList<Article>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,43 +34,90 @@ class FragmentHome: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val lists: ArrayList<Article> = ArrayList()
+        val lm = LinearLayoutManager(context)
 
-        articleAdapter = ArticleAdapter(context, lists)
-        FirebaseHelper().loadArticle(lists, articleAdapter)
-        homeListView.adapter = articleAdapter
+        homeListView.layoutManager = lm
+        homeListView.setHasFixedSize(true)
+        homeListView.addItemDecoration(DividerItemDecoration(homeListView.context, DividerItemDecoration.VERTICAL))
+
+        loadData()
+
+        firestoreListener = database.collection("article")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .addSnapshotListener {documentSnapshots, e ->
+                if (e != null) return@addSnapshotListener
+
+                if (documentSnapshots != null) {
+                    lists = mutableListOf()
+
+                    for (document in documentSnapshots){
+                        val aid = document.id
+                        val uid = document.data["uid"].toString()
+                        val name = document.data["name"].toString()
+                        val timestamp = document.data["timestamp"] as? Timestamp
+                        val main = document.data["main"].toString()
+
+                        val article = Article(aid, uid, name, timestamp, main)
+
+                        lists.add(article)
+                    }
+                }
+                articleAdapter.notifyDataSetChanged()
+                homeListView.adapter = articleAdapter
+            }
 
         newArticleBtn.setOnClickListener {
             startActivity(Intent(context, WriteActivity::class.java))
         }
     }
 
-    class ArticleAdapter(val context: Context?, val articleList: ArrayList<Article>): BaseAdapter(){
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            val view = LayoutInflater.from(context).inflate(R.layout.article_item,null)
+    override fun onStart() {
+        super.onStart()
 
-            val articleName = view.findViewById<TextView>(R.id.articleNameText)
-            val articleDate = view.findViewById<TextView>(R.id.articleDateText)
-            val articleMain = view.findViewById<TextView>(R.id.articleMainText)
+        articleAdapter.startListening()
+    }
 
-            val article = articleList[articleList.size - (position + 1)]
-            articleName.text = article.name
-            articleDate.text= article.date
-            articleMain.text = article.main
+    override fun onDestroy() {
+        super.onDestroy()
 
-            return view
+        firestoreListener.remove()
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        articleAdapter.stopListening()
+    }
+
+    private fun loadData(){
+        val query = database.collection("article").orderBy("timestamp", Query.Direction.DESCENDING)
+
+        val response = FirestoreRecyclerOptions
+            .Builder<Article>()
+            .setQuery(query, Article::class.java)
+            .build()
+
+        articleAdapter = object: FirestoreRecyclerAdapter<Article, ArticleHolder>(response){
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleHolder {
+                val view = LayoutInflater.from(context).inflate(R.layout.article_item, parent, false)
+
+                return ArticleHolder(view)
+            }
+
+            override fun onBindViewHolder(holder: ArticleHolder, position: Int, article: Article) {
+                holder.bind(lists[position])
+
+                holder.layout.setOnClickListener {
+                    val intent = Intent(context, DetailActivity::class.java)
+                    val aid = lists[position].aid
+
+                    intent.putExtra("aid", aid)
+                    context?.startActivity(intent)
+                }
+            }
         }
 
-        override fun getItem(position: Int): Any {
-            return articleList[position]
-        }
-
-        override fun getItemId(position: Int): Long {
-            return 0
-        }
-
-        override fun getCount(): Int {
-            return articleList.size
-        }
+        articleAdapter.notifyDataSetChanged()
+        homeListView.adapter = articleAdapter
     }
 }
