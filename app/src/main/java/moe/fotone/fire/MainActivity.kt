@@ -1,29 +1,21 @@
 package moe.fotone.fire
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth
-    private lateinit var home: FragmentHome
-    private lateinit var dashboard: FragmentDashboard
-    private lateinit var notifications: FragmentNotifications
-
-    private var currentUser: FirebaseUser? = null
+    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    private val home: FragmentHome by lazy { FragmentHome() }
+    private val dashboard: FragmentDashboard by lazy { FragmentDashboard() }
+    private val  notifications: FragmentNotifications by lazy { FragmentNotifications() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        home = FragmentHome()
-        dashboard = FragmentDashboard()
-        notifications = FragmentNotifications()
-
-        auth = FirebaseAuth.getInstance()
 
         val fragmentTransaction = supportFragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.content, home).commitAllowingStateLoss()
@@ -47,6 +39,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        if(auth.currentUser != null){
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
+    }
     private fun replaceFragment(fragment: Fragment){
         val fragmentTransaction = supportFragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.content, fragment).commitAllowingStateLoss();

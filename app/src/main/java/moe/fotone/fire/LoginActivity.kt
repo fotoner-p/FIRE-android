@@ -8,19 +8,15 @@ import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.activity_login.*
 import java.lang.Exception
 
 class LoginActivity : AppCompatActivity(){
-    private lateinit var auth: FirebaseAuth
-    private var currentUser: FirebaseUser? = null
+    private val auth: FirebaseAuth by lazy {FirebaseAuth.getInstance()}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
-        auth = FirebaseAuth.getInstance()
 
         inBtn.setOnClickListener {
             val email = loginEmailText.text.toString()
@@ -35,8 +31,8 @@ class LoginActivity : AppCompatActivity(){
 
     override fun onStart() {
         super.onStart()
-        currentUser = auth.currentUser
-        if(currentUser != null){
+
+        if(auth.currentUser != null){
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
@@ -57,7 +53,6 @@ class LoginActivity : AppCompatActivity(){
                     Toast.makeText(this,"Unknown error" ,Toast.LENGTH_SHORT).show()
                 }
             }else{
-                currentUser = auth.currentUser
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }

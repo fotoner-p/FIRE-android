@@ -3,59 +3,41 @@ package moe.fotone.fire
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.ListView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import moe.fotone.fire.utils.Article as Article
+import kotlinx.android.synthetic.main.fragment_home.*
+import moe.fotone.fire.utils.Article
+import moe.fotone.fire.utils.FirebaseHelper
+
 
 class FragmentHome: Fragment() {
-    private lateinit var auth: FirebaseAuth
-    private lateinit var database: FirebaseDatabase
     private lateinit var articleAdapter: ArticleAdapter
-    private var currentUser: FirebaseUser? = null
-    private var lists: ArrayList<Article> = ArrayList<Article>()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance()
-
-        loadData()
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
-        val listView = view.findViewById<ListView>(R.id.homeListView)
-        val writeBtn = view.findViewById<FloatingActionButton>(R.id.newArticleBtn)
-        lists.clear()
-
-        articleAdapter = ArticleAdapter(context, lists)
-        listView.adapter = articleAdapter
-
-        writeBtn.setOnClickListener {
-            startActivity(Intent(context, WriteActivity::class.java))
-        }
-        return view
+        return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val lists: ArrayList<Article> = ArrayList()
+
+        articleAdapter = ArticleAdapter(context, lists)
+        FirebaseHelper().loadArticle(lists, articleAdapter)
+        homeListView.adapter = articleAdapter
+
+        newArticleBtn.setOnClickListener {
+            startActivity(Intent(context, WriteActivity::class.java))
+        }
+    }
 
     class ArticleAdapter(val context: Context?, val articleList: ArrayList<Article>): BaseAdapter(){
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -84,37 +66,5 @@ class FragmentHome: Fragment() {
         override fun getCount(): Int {
             return articleList.size
         }
-    }
-
-
-    fun loadData(){
-        database.getReference("/article/").addChildEventListener(object: ChildEventListener{
-            override fun onChildAdded(dataSnapshot: DataSnapshot, s: String?) {
-                val uid = dataSnapshot.child("uid").value.toString()
-                val name = dataSnapshot.child("name").value.toString()
-                val date = dataSnapshot.child("date").value.toString()
-                val main = dataSnapshot.child("main").value.toString()
-
-                lists.add(Article(uid, name, date, main))
-
-                articleAdapter.notifyDataSetChanged()
-            }
-            override fun onCancelled(p0: DatabaseError) {
-
-            }
-
-            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-
-            }
-
-            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-
-            }
-
-            override fun onChildRemoved(p0: DataSnapshot) {
-
-            }
-
-        })
     }
 }

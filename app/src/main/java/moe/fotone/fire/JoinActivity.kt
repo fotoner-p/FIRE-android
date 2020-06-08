@@ -10,14 +10,11 @@ import moe.fotone.fire.utils.FirebaseHelper
 import java.lang.Exception
 
 class JoinActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth
-    private var currentUser: FirebaseUser? = null
+    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_join)
-
-        auth = FirebaseAuth.getInstance()
 
         registerBtn.setOnClickListener {
             val email = joinEmailText.text.toString()
@@ -50,9 +47,8 @@ class JoinActivity : AppCompatActivity() {
                     }
                 } else {
                     val base = FirebaseHelper()
-                    currentUser = auth.currentUser
 
-                    base.createUserInfo(currentUser!!.uid, name, email)
+                    base.createUserInfo(auth.currentUser!!.uid, name, email)
 
                     Toast.makeText(this,"가입 성공" ,Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this, MainActivity::class.java))
