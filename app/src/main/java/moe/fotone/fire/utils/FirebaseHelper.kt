@@ -5,7 +5,6 @@ import android.util.Log
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
-
 class FirebaseHelper {
     private val database by lazy {FirebaseFirestore.getInstance()}
 
