@@ -5,10 +5,10 @@
     android:id="@+id/itemLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="16dp"
-    android:paddingTop="16dp"
-    android:paddingRight="16dp"
-    android:paddingBottom="16dp">
+    android:paddingLeft="8dp"
+    android:paddingTop="8dp"
+    android:paddingRight="8dp"
+    android:paddingBottom="8dp">
 
     <ImageView
         android:id="@+id/imageView2"
@@ -52,5 +52,45 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/imageView2"
         app:layout_constraintTop_toBottomOf="@+id/articleNameText" />
+
+    <ImageView
+        android:id="@+id/favoritImage"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toEndOf="@+id/comentText"
+        app:layout_constraintTop_toBottomOf="@+id/articleMainText"
+        app:srcCompat="@drawable/ic_baseline_favorite_border_24" />
+
+    <TextView
+        android:id="@+id/favoritText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="765"
+        app:layout_constraintBottom_toBottomOf="@+id/favoritImage"
+        app:layout_constraintStart_toEndOf="@+id/favoritImage"
+        app:layout_constraintTop_toTopOf="@+id/favoritImage" />
+
+    <ImageView
+        android:id="@+id/comentImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toEndOf="@+id/imageView2"
+        app:layout_constraintTop_toBottomOf="@+id/articleMainText"
+        app:srcCompat="@drawable/ic_baseline_insert_comment_24" />
+
+    <TextView
+        android:id="@+id/comentText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="765"
+        app:layout_constraintBottom_toBottomOf="@+id/comentImage"
+        app:layout_constraintStart_toEndOf="@+id/comentImage"
+        app:layout_constraintTop_toTopOf="@+id/comentImage" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,22 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.google.firebase.Timestamp
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.Query
+import kotlinx.android.synthetic.main.article_item.view.*
 import kotlinx.android.synthetic.main.fragment_home.*
-import moe.fotone.fire.utils.Article
+import moe.fotone.fire.utils.ArticleDTO
 
 class FragmentHome: Fragment() {
+    private lateinit var articleSnapshot: ListenerRegistration
     private val database by lazy { FirebaseFirestore.getInstance()}
-    private lateinit var articleAdapter: FirestoreRecyclerAdapter<Article, ArticleHolder>
-    private lateinit var firestoreListener: ListenerRegistration
-    private lateinit var lists: MutableList<Article>
+    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance()}
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,93 +28,98 @@ class FragmentHome: Fragment() {
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val lm = LinearLayoutManager(context)
-
-        homeListView.layoutManager = lm
-        homeListView.setHasFixedSize(true)
-        homeListView.addItemDecoration(DividerItemDecoration(homeListView.context, DividerItemDecoration.VERTICAL))
-
-        loadData()
-
-        firestoreListener = database.collection("article")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener {documentSnapshots, e ->
-                if (e != null) return@addSnapshotListener
-
-                if (documentSnapshots != null) {
-                    lists = mutableListOf()
-
-                    for (document in documentSnapshots){
-                        val aid = document.id
-                        val uid = document.data["uid"].toString()
-                        val name = document.data["name"].toString()
-                        val timestamp = document.data["timestamp"] as? Timestamp
-                        val main = document.data["main"].toString()
-
-                        val article = Article(aid, uid, name, timestamp, main)
-
-                        lists.add(article)
-                    }
-                }
-                articleAdapter.notifyDataSetChanged()
-                homeListView.adapter = articleAdapter
-            }
-
-        newArticleBtn.setOnClickListener {
-            startActivity(Intent(context, WriteActivity::class.java))
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        articleAdapter.startListening()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        firestoreListener.remove()
+    override fun onResume() {
+        super.onResume()
+        homeListView.layoutManager = LinearLayoutManager(context)
+        homeListView.adapter = ArticleRecyclerViewAdapter()
     }
 
     override fun onStop() {
         super.onStop()
-
-        articleAdapter.stopListening()
+        articleSnapshot.remove()
     }
 
-    private fun loadData(){
-        val query = database.collection("article").orderBy("timestamp", Query.Direction.DESCENDING)
+    inner class ArticleRecyclerViewAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        val articleDTOs: ArrayList<ArticleDTO>
+        val articleUidList: ArrayList<String>
 
-        val response = FirestoreRecyclerOptions
-            .Builder<Article>()
-            .setQuery(query, Article::class.java)
-            .build()
-
-        articleAdapter = object: FirestoreRecyclerAdapter<Article, ArticleHolder>(response){
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleHolder {
-                val view = LayoutInflater.from(context).inflate(R.layout.article_item, parent, false)
-
-                return ArticleHolder(view)
-            }
-
-            override fun onBindViewHolder(holder: ArticleHolder, position: Int, article: Article) {
-                holder.bind(lists[position])
-
-                holder.layout.setOnClickListener {
-                    val intent = Intent(context, DetailActivity::class.java)
-                    val aid = lists[position].aid
-
-                    intent.putExtra("aid", aid)
-                    context?.startActivity(intent)
-                }
-            }
+        init {
+            articleDTOs = ArrayList()
+            articleUidList = ArrayList()
+            getCotents()
         }
 
-        articleAdapter.notifyDataSetChanged()
-        homeListView.adapter = articleAdapter
+        private fun getCotents() {
+            articleSnapshot = database.collection("articles").orderBy("timestamp")
+                .addSnapshotListener{ querySnapshot, firebaseFirestoreException ->
+                    articleDTOs.clear()
+                    articleUidList.clear()
+
+                    if (querySnapshot == null) return@addSnapshotListener
+
+                    else for (document in querySnapshot.documents){
+                        val item = document.toObject(ArticleDTO::class.java)!!
+
+                        articleDTOs.add(item)
+                        articleUidList.add(document.id)
+                    }
+                    notifyDataSetChanged()
+                }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.article_item, parent, false)
+
+            return CustomViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            val viewHolder = (holder as CustomViewHolder).itemView
+
+            viewHolder.articleNameText.text = articleDTOs[position].name
+            viewHolder.articleMainText.text = articleDTOs[position].main
+            viewHolder.articleDateText.text = articleDTOs[position].timestamp.toString()
+            viewHolder.favoritText.text = articleDTOs[position].favoriteCount.toString()
+            viewHolder.comentText.text = articleDTOs[position].commentCount.toString()
+
+            if (articleDTOs[position].favorites.containsKey(auth.currentUser!!.uid)){
+                viewHolder.favoritImage.setImageResource(R.drawable.ic_baseline_favorite_24)
+            }
+            else {
+                viewHolder.favoritImage.setImageResource(R.drawable.ic_baseline_favorite_border_24)
+            }
+
+            viewHolder.favoritImage.setOnClickListener{
+                favoriteEvent(position)
+            }
+
+            viewHolder.setOnClickListener {
+                val intent = Intent(context, DetailActivity::class.java)
+
+                intent.putExtra("articleUid", articleUidList[position])
+                intent.putExtra("destinationUid", articleDTOs[position].uid)
+
+                startActivity(intent)
+            }
+        }
+        private fun favoriteEvent(position: Int){
+            var tsDoc = database.collection("Articles").document(articleUidList[position])
+            database.runTransaction { transaction ->
+                val uid = auth.currentUser!!.uid
+                val articleDTO = transaction.get(tsDoc).toObject(ArticleDTO::class.java)
+
+                if(articleDTO!!.favorites.containsKey(uid)){
+                    articleDTO.favoriteCount = articleDTO.favoriteCount - 1
+                    articleDTO.favorites.remove(uid)
+                } else {
+                    articleDTO.favoriteCount = articleDTO.favoriteCount - 1
+                    articleDTO.favorites[uid] = true
+                }
+                transaction.set(tsDoc, articleDTO)
+            }
+        }
+        override fun getItemCount(): Int = articleDTOs.size
     }
+
+    inner class CustomViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 }
