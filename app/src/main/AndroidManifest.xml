@@ -11,11 +11,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".UserActivity"></activity>
-        <activity android:name=".DetailActivity" />
-        <activity android:name=".WriteActivity" />
+        <activity android:name=".UserActivity" />
+        <activity
+            android:name=".DetailActivity"
+            android:label="@string/article"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".WriteActivity"
+            android:label="@string/writeArticle"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MainActivity"
+            android:theme="@style/MainTheme"
             android:label="@string/title_activity_main" />
         <activity android:name=".JoinActivity" />
         <activity android:name=".LoginActivity">
@@ -25,9 +32,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddActivity" />
-        <activity android:name=".ModifyActivity" />
-        <activity android:name=".DeleteActivity" />
     </application>
 
 </manifest>

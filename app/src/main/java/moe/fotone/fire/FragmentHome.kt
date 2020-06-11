@@ -6,14 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.article_item.view.*
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.fragment_home.view.*
 import moe.fotone.fire.utils.ArticleDTO
+import java.util.*
+import kotlin.collections.ArrayList
 
 class FragmentHome: Fragment() {
     private lateinit var articleSnapshot: ListenerRegistration
@@ -25,7 +30,13 @@ class FragmentHome: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+
+        view.newArticleBtn.setOnClickListener {
+            startActivity(Intent(context, WriteActivity::class.java))
+        }
+
+        return view
     }
 
     override fun onResume() {
@@ -50,7 +61,7 @@ class FragmentHome: Fragment() {
         }
 
         private fun getCotents() {
-            articleSnapshot = database.collection("articles").orderBy("timestamp")
+            articleSnapshot = database.collection("articles").orderBy("timestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener{ querySnapshot, firebaseFirestoreException ->
                     articleDTOs.clear()
                     articleUidList.clear()
@@ -75,10 +86,19 @@ class FragmentHome: Fragment() {
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             val viewHolder = (holder as CustomViewHolder).itemView
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = articleDTOs[position].timestamp!!
+
+            val dateText =
+                calendar.get(Calendar.YEAR).toString() + '-' +
+                calendar.get(Calendar.MONTH).toString() + '-' +
+                calendar.get(Calendar.DAY_OF_MONTH).toString() + " · " +
+                calendar.get(Calendar.HOUR_OF_DAY).toString() + ":" +
+                calendar.get(Calendar.MINUTE).toString()
 
             viewHolder.articleNameText.text = articleDTOs[position].name
             viewHolder.articleMainText.text = articleDTOs[position].main
-            viewHolder.articleDateText.text = articleDTOs[position].timestamp.toString()
+            viewHolder.articleDateText.text = dateText
             viewHolder.favoritText.text = articleDTOs[position].favoriteCount.toString()
             viewHolder.comentText.text = articleDTOs[position].commentCount.toString()
 
@@ -97,13 +117,14 @@ class FragmentHome: Fragment() {
                 val intent = Intent(context, DetailActivity::class.java)
 
                 intent.putExtra("articleUid", articleUidList[position])
-                intent.putExtra("destinationUid", articleDTOs[position].uid)
+                intent.putExtra("writerUid", articleDTOs[position].uid)
 
                 startActivity(intent)
             }
         }
         private fun favoriteEvent(position: Int){
-            var tsDoc = database.collection("Articles").document(articleUidList[position])
+            val tsDoc = database.collection("articles").document(articleUidList[position])
+
             database.runTransaction { transaction ->
                 val uid = auth.currentUser!!.uid
                 val articleDTO = transaction.get(tsDoc).toObject(ArticleDTO::class.java)
@@ -112,7 +133,7 @@ class FragmentHome: Fragment() {
                     articleDTO.favoriteCount = articleDTO.favoriteCount - 1
                     articleDTO.favorites.remove(uid)
                 } else {
-                    articleDTO.favoriteCount = articleDTO.favoriteCount - 1
+                    articleDTO.favoriteCount = articleDTO.favoriteCount + 1
                     articleDTO.favorites[uid] = true
                 }
                 transaction.set(tsDoc, articleDTO)

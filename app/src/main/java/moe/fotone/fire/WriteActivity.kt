@@ -17,6 +17,7 @@ class WriteActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_write)
 
+
         sansBtn.setOnClickListener{
             articleUpload()
             finish()
@@ -33,7 +34,7 @@ class WriteActivity : AppCompatActivity() {
                 article.main = writeTextMain.text.toString()
                 article.timestamp = System.currentTimeMillis()
 
-                database.collection("article").document().set(article)
+                database.collection("articles").document().set(article)
 
                 setResult(Activity.RESULT_OK)
                 finish()
