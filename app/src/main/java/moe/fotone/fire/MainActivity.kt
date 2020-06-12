@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val home: FragmentHome by lazy { FragmentHome() }
-    private val dashboard: FragmentDashboard by lazy { FragmentDashboard() }
+    private val dashboard: FragmentUser by lazy { FragmentUser() }
     private val  notifications: FragmentNotifications by lazy { FragmentNotifications() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
