@@ -127,18 +127,19 @@ class FragmentDetail: Fragment() {
 
     private fun sendComment(){
         val docRef = database.collection("articles").document(articleUid)
-
+        val userRef = database.collection("user").document(auth.currentUser!!.uid)
         database.runTransaction{transaction ->
             val comment = ArticleDTO.Comment()
             val articleDTO = transaction.get(docRef).toObject(ArticleDTO::class.java)
+            val name = transaction.get(userRef)["name"].toString()
 
             comment.aid = articleUid
             comment.uid = auth.currentUser!!.uid
-            comment.name = articleDTO!!.name
+            comment.name = name
             comment.main = commentText.text.toString()
             comment.timestamp = System.currentTimeMillis()
 
-            articleDTO.commentCount += 1
+            articleDTO?.commentCount = articleDTO?.commentCount?.plus(1)!!
 
             transaction.set(docRef, articleDTO)
             transaction.set(docRef.collection("comments").document(), comment)

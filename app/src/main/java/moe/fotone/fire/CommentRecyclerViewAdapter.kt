@@ -68,10 +68,11 @@ class CommentRecyclerViewAdapter(private val activity: FragmentActivity, private
         database
             .collection("profileImages")
             .document(commentDTOs[position].uid!!)
-            .addSnapshotListener{documentSnapshot, e ->
-                if (documentSnapshot?.data != null) {
+            .get()
+            .addOnCompleteListener {task ->
+                if (task.isSuccessful && task.result!!["image"] != null){
+                    val url = task.result!!["image"].toString()
 
-                    val url = documentSnapshot.data!!["image"]
                     Glide.with(holder.itemView.context)
                         .load(url)
                         .apply(RequestOptions().circleCrop()).into(viewHolder.commentUserImage)

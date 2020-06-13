@@ -40,6 +40,14 @@ class FragmentUser: Fragment() {
         uid = arguments?.getString("destinationUid").toString()
 
         if (uid == auth.currentUser!!.uid) {
+            view.userFollowBtn.text = "Logout"
+
+            view.userFollowBtn.setOnClickListener {
+                startActivity(Intent(activity, LoginActivity::class.java))
+                activity?.finish()
+                auth.signOut()
+            }
+
             view.userImage.setOnClickListener {
                 if (ContextCompat.checkSelfPermission(
                         requireActivity(),
@@ -53,6 +61,11 @@ class FragmentUser: Fragment() {
                         PICK_PROFILE_FROM_ALBUM
                     )
                 }
+            }
+        }
+        else{
+            view.userFollowBtn.setOnClickListener {
+                println("NONE")
             }
         }
 
