@@ -1,116 +1,174 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    tools:context=".FragmentUser">
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="8dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:id="@+id/account_iv_profile"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_alignParentLeft="true"
-            app:srcCompat="@color/colorPrimaryDark" />
-
-        <Button
-            android:id="@+id/account_btn_follow_signout"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/account_iv_profile"
-            android:text="팔로우" />
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@id/account_btn_follow_signout"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_toRightOf="@id/account_iv_profile"
-            android:baselineAligned="true"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="16dp"
+                android:paddingTop="16dp"
+                android:paddingRight="16dp">
+
+                <ImageView
+                    android:id="@+id/userImage"
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:foreground="@drawable/rounded_fg"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@color/colorPrimaryDark" />
+
+                <Button
+                    android:id="@+id/account_btn_follow_signout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:background="@drawable/button_shape"
+                    android:text="Follow"
+                    android:textColor="@color/colorPrimary"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:id="@+id/userNameText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="3dp"
-                    android:text="게시글" />
+                    android:layout_marginStart="16dp"
+                    android:text="Loading"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/userImage"
+                    app:layout_constraintStart_toEndOf="@+id/userImage"
+                    app:layout_constraintTop_toTopOf="@+id/userImage"
+                    app:layout_constraintVertical_bias="0.333" />
 
                 <TextView
-                    android:id="@+id/account_tv_post_count"
+                    android:id="@+id/userEmailText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="765"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                    android:text="Loading"
+                    app:layout_constraintStart_toStartOf="@+id/userNameText"
+                    app:layout_constraintTop_toBottomOf="@+id/userNameText" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/textView3"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="3dp"
-                    android:text="팔로워" />
+                    android:layout_marginTop="8dp"
+                    android:text="Loading"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/userImage" />
 
-                <TextView
-                    android:id="@+id/account_tv_follower_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="765"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                <View
+                    android:id="@+id/view4"
+                    android:layout_width="0dp"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/line_color"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                <LinearLayout
+                    android:id="@+id/linearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:baselineAligned="true"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView3">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="3dp"
-                    android:text="팔로잉" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="left">
 
-                <TextView
-                    android:id="@+id/account_tv_following_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="765"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
+                            android:text="Articles" />
+
+                        <TextView
+                            android:id="@+id/userAritcleCountText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="765"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="left">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
+                            android:text="Follower" />
+
+                        <TextView
+                            android:id="@+id/account_tv_follower_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="765"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="left">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
+                            android:text="Following" />
+
+                        <TextView
+                            android:id="@+id/account_tv_following_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="765"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <RelativeLayout
+                android:id="@+id/userArticleRelativeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/userListview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:listitem="@layout/article_item" />
+
+            </RelativeLayout>
         </LinearLayout>
-    </RelativeLayout>
+    </ScrollView>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/userListview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:listitem="@layout/article_item" />
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

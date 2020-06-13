@@ -1,10 +1,10 @@
 package moe.fotone.fire
 
-import android.content.Context
-import android.content.Intent
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -16,11 +16,10 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ArticleRecyclerViewAdapter(context: Context?, type: String): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ArticleRecyclerViewAdapter(private val activity: FragmentActivity, private val type: String): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     lateinit var articleSnapshot: ListenerRegistration
     private val database by lazy { FirebaseFirestore.getInstance()}
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance()}
-    private val context = context
 
     val articleDTOs: ArrayList<ArticleDTO>
     val articleUidList: ArrayList<String>
@@ -32,23 +31,24 @@ class ArticleRecyclerViewAdapter(context: Context?, type: String): RecyclerView.
     }
 
     private fun getCotents(type: String) {
-        lateinit var query: Query
-        if (type == "main")
-            query = database.collection("articles").orderBy("timestamp", Query.Direction.DESCENDING)
-        else
-            query = database.collection("articles").whereEqualTo("uid", type).orderBy("timestamp", Query.Direction.DESCENDING)
+        val query = database.collection("articles").orderBy("timestamp", Query.Direction.DESCENDING)
 
         articleSnapshot = query.addSnapshotListener{ querySnapshot, firebaseFirestoreException ->
             articleDTOs.clear()
             articleUidList.clear()
+            notifyDataSetChanged()
 
             if (querySnapshot == null) return@addSnapshotListener
 
             else for (document in querySnapshot.documents){
                 val item = document.toObject(ArticleDTO::class.java)!!
 
+                if (type != "main" && document["uid"] != type)
+                    continue
+
                 articleDTOs.add(item)
                 articleUidList.add(document.id)
+
             }
             notifyDataSetChanged()
         }
@@ -85,34 +85,49 @@ class ArticleRecyclerViewAdapter(context: Context?, type: String): RecyclerView.
             viewHolder.favoritImage.setImageResource(R.drawable.ic_baseline_favorite_border_24)
         }
 
+        if (type=="main") {
+            viewHolder.detailArticleUserImage.setOnClickListener {
+                val fragment = FragmentUser()
+                val bundle = Bundle()
+                val transaction = activity.supportFragmentManager.beginTransaction()
+
+                bundle.putString("destinationUid", articleDTOs[position].uid)
+                fragment.arguments = bundle
+                transaction.replace(R.id.content, fragment).addToBackStack(null).replace(R.id.content, fragment).commit()
+            }
+        }
+
         viewHolder.favoritImage.setOnClickListener{
             favoriteEvent(position)
         }
 
         viewHolder.setOnClickListener {
-            val intent = Intent(context, DetailActivity::class.java)
+            val fragment = FragmentDetail()
+            val bundle = Bundle()
+            val transaction = activity.supportFragmentManager.beginTransaction()
 
-            intent.putExtra("articleUid", articleUidList[position])
-            intent.putExtra("writerUid", articleDTOs[position].uid)
+            bundle.putString("writerUid", articleDTOs[position].uid)
+            bundle.putString("articleUid", articleUidList[position])
 
-            context?.startActivity(intent)
+            fragment.arguments = bundle
+            transaction.replace(R.id.content, fragment).addToBackStack(null).replace(R.id.content, fragment).commit()
         }
     }
     private fun favoriteEvent(position: Int){
-        val tsDoc = database.collection("articles").document(articleUidList[position])
+        val docRef = database.collection("articles").document(articleUidList[position])
 
         database.runTransaction { transaction ->
             val uid = auth.currentUser!!.uid
-            val articleDTO = transaction.get(tsDoc).toObject(ArticleDTO::class.java)
+            val articleDTO = transaction.get(docRef).toObject(ArticleDTO::class.java)
 
             if(articleDTO!!.favorites.containsKey(uid)){
-                articleDTO.favoriteCount = articleDTO.favoriteCount - 1
+                articleDTO.favoriteCount -= 1
                 articleDTO.favorites.remove(uid)
             } else {
-                articleDTO.favoriteCount = articleDTO.favoriteCount + 1
+                articleDTO.favoriteCount += 1
                 articleDTO.favorites[uid] = true
             }
-            transaction.set(tsDoc, articleDTO)
+            transaction.set(docRef, articleDTO)
         }
     }
     override fun getItemCount(): Int = articleDTOs.size

@@ -32,7 +32,7 @@ class FragmentHome: Fragment() {
     override fun onResume() {
         super.onResume()
         homeListView.layoutManager = LinearLayoutManager(context)
-        homeListView.adapter = ArticleRecyclerViewAdapter(context, "main")
+        homeListView.adapter = ArticleRecyclerViewAdapter(requireActivity(), "main")
         articleSnapshot = (homeListView.adapter as ArticleRecyclerViewAdapter).articleSnapshot
     }
 

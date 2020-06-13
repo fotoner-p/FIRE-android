@@ -8,9 +8,10 @@ data class ArticleDTO(var uid:String? = null,
                       var commentCount: Int = 0,
                       var favorites: MutableMap<String, Boolean> = HashMap()){
 
-    data class Comment(var uid: String? = null,
-                       var userId: String? = null,
-                       var comment: String? = null,
+    data class Comment(var aid: String? = null,
+                       var uid: String? = null,
+                       var name:String? = null,
+                       var main: String? = null,
                        var timestamp: Long? = null)
 }
 
