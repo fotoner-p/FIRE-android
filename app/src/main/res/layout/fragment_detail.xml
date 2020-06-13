@@ -54,7 +54,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/loading"
-                    app:layout_constraintBottom_toBottomOf="@+id/detailArticleUserImage"
+                    app:layout_constraintBottom_toBottomOf="@+id/detailUserImage"
                     app:layout_constraintStart_toStartOf="@+id/detailArticleNameText"
                     app:layout_constraintTop_toBottomOf="@+id/detailArticleNameText" />
 
@@ -67,7 +67,7 @@
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/detailArticleUserImage" />
+                    app:layout_constraintTop_toBottomOf="@+id/detailUserImage" />
 
                 <ImageView
                     android:id="@+id/detailCommentImage"
@@ -79,7 +79,7 @@
                     app:srcCompat="@drawable/ic_baseline_insert_comment_24" />
 
                 <ImageView
-                    android:id="@+id/detailArticleUserImage"
+                    android:id="@+id/detailUserImage"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:foreground="@drawable/rounded_fg"
@@ -104,8 +104,8 @@
                     android:layout_marginStart="8dp"
                     android:text="@string/loading"
                     android:textSize="18sp"
-                    app:layout_constraintStart_toEndOf="@+id/detailArticleUserImage"
-                    app:layout_constraintTop_toTopOf="@+id/detailArticleUserImage" />
+                    app:layout_constraintStart_toEndOf="@+id/detailUserImage"
+                    app:layout_constraintTop_toTopOf="@+id/detailUserImage" />
 
                 <TextView
                     android:id="@+id/detailFavoriteText"

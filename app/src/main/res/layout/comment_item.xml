@@ -12,7 +12,7 @@
 
 
     <ImageView
-        android:id="@+id/detailArticleUserImage"
+        android:id="@+id/commentUserImage"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:foreground="@drawable/rounded_fg"
@@ -27,9 +27,9 @@
         android:layout_marginStart="8dp"
         android:text="@string/loading"
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="@+id/detailArticleUserImage"
-        app:layout_constraintStart_toEndOf="@+id/detailArticleUserImage"
-        app:layout_constraintTop_toTopOf="@+id/detailArticleUserImage"
+        app:layout_constraintBottom_toBottomOf="@+id/commentUserImage"
+        app:layout_constraintStart_toEndOf="@+id/commentUserImage"
+        app:layout_constraintTop_toTopOf="@+id/commentUserImage"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
@@ -49,7 +49,7 @@
         android:layout_marginStart="8dp"
         android:text="@string/loading"
         android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@+id/detailArticleUserImage"
+        app:layout_constraintStart_toEndOf="@+id/commentUserImage"
         app:layout_constraintTop_toBottomOf="@+id/commentNameText" />
 
     <View
@@ -60,6 +60,6 @@
         android:background="@color/line_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detailArticleUserImage" />
+        app:layout_constraintTop_toBottomOf="@+id/commentUserImage" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

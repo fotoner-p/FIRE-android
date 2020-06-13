@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -17,9 +19,10 @@ import java.util.*
 class FragmentDetail: Fragment() {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance()}
     private val database: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
+    private lateinit var articleSnapshot: ListenerRegistration
+    private lateinit var imageProfileListenerRegistration: ListenerRegistration
     private lateinit var articleUid:String
     private lateinit var writerUid:String
-    private lateinit var articleSnapshot: ListenerRegistration
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,7 +34,7 @@ class FragmentDetail: Fragment() {
         articleUid = arguments?.getString("articleUid").toString()
         writerUid = arguments?.getString("writerUid").toString()
 
-        view.detailArticleUserImage.setOnClickListener {
+        view.detailUserImage.setOnClickListener {
             val fragment = FragmentUser()
             val bundle = Bundle()
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
@@ -89,13 +92,28 @@ class FragmentDetail: Fragment() {
     override fun onResume() {
         super.onResume()
         detailComentListView.layoutManager = LinearLayoutManager(context)
-        detailComentListView.adapter = CommentRecyclerViewAdapter(articleUid)
+        detailComentListView.adapter = CommentRecyclerViewAdapter(requireActivity(), articleUid)
         articleSnapshot = (detailComentListView.adapter as CommentRecyclerViewAdapter).articleSnapshot
+        getProfileImage()
+    }
+
+    private fun getProfileImage() {
+        imageProfileListenerRegistration = database.collection("profileImages").document(writerUid)
+            .addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+
+                if (documentSnapshot?.data != null) {
+                    val url = documentSnapshot.data!!["image"]
+                    Glide.with(requireActivity())
+                        .load(url)
+                        .apply(RequestOptions().circleCrop()).into(detailUserImage)
+                }
+            }
     }
 
     override fun onStop() {
         super.onStop()
         articleSnapshot.remove()
+        imageProfileListenerRegistration.remove()
     }
 
     private fun sendComment(){

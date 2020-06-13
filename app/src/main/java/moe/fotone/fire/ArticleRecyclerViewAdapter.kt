@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -17,9 +19,9 @@ import kotlin.collections.ArrayList
 
 
 class ArticleRecyclerViewAdapter(private val activity: FragmentActivity, private val type: String): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    lateinit var articleSnapshot: ListenerRegistration
     private val database by lazy { FirebaseFirestore.getInstance()}
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance()}
+    lateinit var articleSnapshot: ListenerRegistration
 
     val articleDTOs: ArrayList<ArticleDTO>
     val articleUidList: ArrayList<String>
@@ -78,6 +80,19 @@ class ArticleRecyclerViewAdapter(private val activity: FragmentActivity, private
         viewHolder.favoritText.text = articleDTOs[position].favoriteCount.toString()
         viewHolder.comentText.text = articleDTOs[position].commentCount.toString()
 
+        database
+            .collection("profileImages")
+            .document(articleDTOs[position].uid!!)
+            .addSnapshotListener{documentSnapshot, e ->
+                if (documentSnapshot?.data != null) {
+
+                    val url = documentSnapshot.data!!["image"]
+                    Glide.with(holder.itemView.context)
+                        .load(url)
+                        .apply(RequestOptions().circleCrop()).into(viewHolder.articleUserImage)
+                }
+            }
+
         if (articleDTOs[position].favorites.containsKey(auth.currentUser!!.uid)){
             viewHolder.favoritImage.setImageResource(R.drawable.ic_baseline_favorite_24)
         }
@@ -86,7 +101,7 @@ class ArticleRecyclerViewAdapter(private val activity: FragmentActivity, private
         }
 
         if (type=="main") {
-            viewHolder.detailArticleUserImage.setOnClickListener {
+            viewHolder.articleUserImage.setOnClickListener {
                 val fragment = FragmentUser()
                 val bundle = Bundle()
                 val transaction = activity.supportFragmentManager.beginTransaction()

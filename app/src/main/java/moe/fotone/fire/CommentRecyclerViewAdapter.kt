@@ -1,9 +1,13 @@
 package moe.fotone.fire
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -13,7 +17,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class CommentRecyclerViewAdapter(private val aid: String): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class CommentRecyclerViewAdapter(private val activity: FragmentActivity, private val aid: String): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     lateinit var articleSnapshot: ListenerRegistration
     private val database: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val commentDTOs: ArrayList<ArticleDTO.Comment> = ArrayList()
@@ -60,6 +64,29 @@ class CommentRecyclerViewAdapter(private val aid: String): RecyclerView.Adapter<
         viewHolder.commentNameText.text = commentDTOs[position].name
         viewHolder.commentMainText.text = commentDTOs[position].main
         viewHolder.commentDateText.text = dateText
+
+        database
+            .collection("profileImages")
+            .document(commentDTOs[position].uid!!)
+            .addSnapshotListener{documentSnapshot, e ->
+                if (documentSnapshot?.data != null) {
+
+                    val url = documentSnapshot.data!!["image"]
+                    Glide.with(holder.itemView.context)
+                        .load(url)
+                        .apply(RequestOptions().circleCrop()).into(viewHolder.commentUserImage)
+                }
+            }
+
+        viewHolder.commentUserImage.setOnClickListener {
+            val fragment = FragmentUser()
+            val bundle = Bundle()
+            val transaction = activity.supportFragmentManager.beginTransaction()
+
+            bundle.putString("destinationUid", commentDTOs[position].uid)
+            fragment.arguments = bundle
+            transaction.replace(R.id.content, fragment).addToBackStack(null).replace(R.id.content, fragment).commit()
+        }
     }
 
     override fun getItemCount(): Int = commentDTOs.size
