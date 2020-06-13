@@ -110,4 +110,9 @@ class FragmentUser: Fragment() {
         articleSnapshot.remove()
         imageProfileListenerRegistration.remove()
     }
+    /*
+    private fun requestFollow(){
+        val followRef = database.collection("")
+    }
+    */
 }

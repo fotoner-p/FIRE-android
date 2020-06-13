@@ -38,7 +38,6 @@ class ArticleRecyclerViewAdapter(private val activity: FragmentActivity, private
         articleSnapshot = query.addSnapshotListener{ querySnapshot, firebaseFirestoreException ->
             articleDTOs.clear()
             articleUidList.clear()
-            notifyDataSetChanged()
 
             if (querySnapshot == null) return@addSnapshotListener
 

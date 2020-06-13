@@ -31,7 +31,6 @@ class CommentRecyclerViewAdapter(private val activity: FragmentActivity, private
 
         articleSnapshot = query.addSnapshotListener{ querySnapshot, firebaseFirestoreException ->
             commentDTOs.clear()
-            notifyDataSetChanged()
 
             if (querySnapshot == null) return@addSnapshotListener
 
