@@ -134,7 +134,19 @@
                     android:layout_marginTop="8dp"
                     android:text="@string/loading"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/detailArticleMainText" />
+                    app:layout_constraintTop_toBottomOf="@+id/detailArticleImage" />
+
+                <ImageView
+                    android:id="@+id/detailArticleImage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/detailArticleMainText"
+                    tools:srcCompat="@tools:sample/avatars" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <RelativeLayout

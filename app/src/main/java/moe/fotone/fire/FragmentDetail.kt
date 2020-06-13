@@ -11,6 +11,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.android.synthetic.main.article_item.view.*
 import kotlinx.android.synthetic.main.fragment_detail.*
 import kotlinx.android.synthetic.main.fragment_detail.view.*
 import moe.fotone.fire.utils.ArticleDTO
@@ -74,6 +75,14 @@ class FragmentDetail: Fragment() {
                 view.detailArticleMainText.text = article.main.toString()
                 view.detailFavoriteText.text = article.favoriteCount.toString()
                 view.detailCommentText.text = article.commentCount.toString()
+
+                if (article.imageUrl != null){
+                    Glide.with(requireActivity())
+                        .load(article.imageUrl)
+                        .into(view.detailArticleImage)
+
+                    view.detailArticleImage.visibility = View.VISIBLE
+                }
 
                 if (article.favorites.containsKey(auth.currentUser!!.uid)){
                     view.detailFavoriteImage.setImageResource(R.drawable.ic_baseline_favorite_24)

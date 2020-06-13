@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/commentLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -54,7 +55,7 @@
     <TextView
         android:id="@+id/articleMainText"
         android:layout_width="0dp"
-        android:layout_height="22dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="@string/loading"
         android:textSize="16sp"
@@ -70,7 +71,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toEndOf="@+id/comentText"
-        app:layout_constraintTop_toBottomOf="@+id/articleMainText"
+        app:layout_constraintTop_toBottomOf="@+id/articleMainIamge"
         app:srcCompat="@drawable/ic_baseline_favorite_border_24" />
 
     <TextView
@@ -90,7 +91,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toEndOf="@+id/articleUserImage"
-        app:layout_constraintTop_toBottomOf="@+id/articleMainText"
+        app:layout_constraintTop_toBottomOf="@+id/articleMainIamge"
         app:srcCompat="@drawable/ic_baseline_insert_comment_24" />
 
     <TextView
@@ -102,5 +103,18 @@
         app:layout_constraintBottom_toBottomOf="@+id/comentImage"
         app:layout_constraintStart_toEndOf="@+id/comentImage"
         app:layout_constraintTop_toTopOf="@+id/comentImage" />
+
+    <ImageView
+        android:id="@+id/articleMainIamge"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="8dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/articleMainText"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/articleMainText"
+        app:layout_constraintTop_toBottomOf="@+id/articleMainText"
+        tools:srcCompat="@tools:sample/avatars" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

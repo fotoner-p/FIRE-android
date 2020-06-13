@@ -80,6 +80,14 @@ class ArticleRecyclerViewAdapter(private val activity: FragmentActivity, private
         viewHolder.favoritText.text = articleDTOs[position].favoriteCount.toString()
         viewHolder.comentText.text = articleDTOs[position].commentCount.toString()
 
+        if(articleDTOs[position].imageUrl != null){
+            Glide.with(holder.itemView.context)
+                .load(articleDTOs[position].imageUrl)
+                .into(viewHolder.articleMainIamge)
+
+            viewHolder.articleMainIamge.visibility = View.VISIBLE
+        }
+
         database
             .collection("profileImages")
             .document(articleDTOs[position].uid!!)

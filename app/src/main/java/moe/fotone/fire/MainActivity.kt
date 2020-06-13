@@ -101,7 +101,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                     storageRef.downloadUrl.addOnCompleteListener {task->
                         if (task.isSuccessful) {
                             val url = task.result.toString()
-                            println(storageRef.downloadUrl)
                             val map = HashMap<String, Any>()
                             map["image"] = url
                             database.collection("profileImages").document(uid).set(map)
