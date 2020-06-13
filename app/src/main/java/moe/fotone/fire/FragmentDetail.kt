@@ -146,10 +146,10 @@ class FragmentDetail: Fragment() {
             val articleDTO = transaction.get(tsDoc).toObject(ArticleDTO::class.java)
 
             if(articleDTO!!.favorites.containsKey(uid)){
-                articleDTO.favoriteCount = articleDTO.favoriteCount - 1
+                articleDTO.favoriteCount -= 1
                 articleDTO.favorites.remove(uid)
             } else {
-                articleDTO.favoriteCount = articleDTO.favoriteCount + 1
+                articleDTO.favoriteCount += 1
                 articleDTO.favorites[uid] = true
             }
             transaction.set(tsDoc, articleDTO)

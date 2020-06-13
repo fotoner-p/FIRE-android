@@ -4,49 +4,40 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val database by lazy { FirebaseFirestore.getInstance()}
     private val storage by lazy { FirebaseStorage.getInstance() }
-    private val home: FragmentHome by lazy { FragmentHome() }
-    private val dashboard: FragmentUser by lazy { FragmentUser() }
-    private val notifications: FragmentNotifications by lazy { FragmentNotifications() }
+    private var beforeSelected: Int = R.id.navigation_home
+    private val fragmentMap: HashMap<Int, Fragment?> = HashMap()
     private val PICK_PROFILE_FROM_ALBUM = 10
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1)
+        fragmentMap[R.id.navigation_home] = FragmentHome()
+        fragmentMap[R.id.navigation_dashboard] = FragmentDashboard()
+        fragmentMap[R.id.navigation_notifications] = FragmentNotifications()
 
-        val fragmentTransaction = supportFragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content, home).commitAllowingStateLoss()
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+            1
+        )
 
-        mainNavigation.setOnNavigationItemSelectedListener {
-            when(it.itemId){
-                R.id.navigation_home -> {
-                    replaceFragment(home)
-                    return@setOnNavigationItemSelectedListener true
-                }
-                R.id.navigation_dashboard -> {
-                    replaceFragment(dashboard)
-                    return@setOnNavigationItemSelectedListener true
-                }
-                R.id.navigation_notifications -> {
-                    replaceFragment(notifications)
-                    return@setOnNavigationItemSelectedListener true
-                }
-            }
-            return@setOnNavigationItemSelectedListener false
-        }
+        mainNavigation.setOnNavigationItemSelectedListener(this)
+        mainNavigation.selectedItemId = R.id.navigation_home
     }
 
     override fun onStart() {
@@ -55,6 +46,43 @@ class MainActivity : AppCompatActivity() {
         if(auth.currentUser == null){
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
+        }
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        if(beforeSelected == item.itemId){
+            lateinit var fragment: Fragment
+
+            when(item.itemId){
+                R.id.navigation_home -> fragment =  FragmentHome()
+                R.id.navigation_dashboard -> fragment = FragmentDashboard()
+                R.id.navigation_notifications -> fragment = FragmentNotifications()
+            }
+
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.content, fragment)
+                .commit()
+
+            fragmentMap[item.itemId] = fragment
+
+            beforeSelected = item.itemId
+
+            return true
+        }
+        else{
+            for (fragment in supportFragmentManager.fragments){
+                if(fragment != null && fragment.isVisible) {
+                    fragmentMap[beforeSelected] = fragment
+                    break
+                }
+            }
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.content, fragmentMap[item.itemId]!!)
+                .commit()
+
+            beforeSelected = item.itemId
+
+            return true
         }
     }
 
