@@ -126,7 +126,7 @@ class FragmentUser: Fragment() {
         followingListenerRegistration = query.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
             if (documentSnapshot != null && documentSnapshot.exists()){
                 val followDTO = documentSnapshot.toObject(FollowDTO::class.java)
-                println(followDTO)
+
                 userFollowingCountText.setText(followDTO?.followingCount.toString())
             }
             else
@@ -137,7 +137,7 @@ class FragmentUser: Fragment() {
 
             if (documentSnapshot != null && documentSnapshot.exists()){
                 val followDTO = documentSnapshot.toObject(FollowDTO::class.java)
-                println(followDTO)
+
                 userFollowerCountText.setText(followDTO?.followerCount.toString())
                 if (followDTO!!.followers.containsKey(auth.currentUser!!.uid)) {
                     userFollowBtn.text = "unfollow"
@@ -148,65 +148,73 @@ class FragmentUser: Fragment() {
             }
         }
     }
+
+
     private fun requestFollow(){
         val followingRef = database.collection("followInfo").document(auth.currentUser!!.uid)
-        val userRef = database.collection("user").document(auth.currentUser!!.uid)
 
-        database.runTransaction{transaction ->
-            var followDTO: FollowDTO? = transaction.get(followingRef).toObject(FollowDTO::class.java)
-            var userName = transaction.get(userRef)["name"].toString()
+        database.collection("user")
+            .document(auth.currentUser!!.uid)
+            .get()
+            .addOnSuccessListener  { document ->
+                val userName= document["name"].toString()
 
-            if(followDTO == null){
-                followDTO = FollowDTO()
-                followDTO.followingCount = 1
-                followDTO.followings[uid] = true
-                followerNotification(uid, userName)
+                database
+                    .collection("followInfo")
+                    .document(auth.currentUser!!.uid)
+                    .get()
+                    .addOnSuccessListener {
+                        if(it != null && it.exists()){
+                            val followDTO = it.toObject(FollowDTO::class.java)!!
 
-                transaction.set(followingRef, followDTO)
+                            if (followDTO.followings.containsKey(uid)){
+                                followDTO.followingCount = followDTO.followingCount - 1
+                                followDTO.followings.remove(uid)
+                                userFollowBtn.text = "follow"
+                            } else {
+                                followDTO.followingCount = followDTO.followingCount + 1
+                                followDTO.followings[uid] = true
+                                followerNotification(uid, userName)
+                            }
+                            followingRef.set(followDTO)
+                        }
+                        else{
+                            val followDTO = FollowDTO()
+                            followDTO.followingCount = 1
+                            followDTO.followings[uid] = true
+                            followerNotification(uid, userName)
 
-                return@runTransaction
+                            followingRef.set(followDTO)
+                        }
+                    }
             }
-
-            if (followDTO.followings.containsKey(uid)){
-                followDTO.followingCount = followDTO.followingCount - 1
-                followDTO.followings.remove(uid)
-
-                userFollowBtn.text = "follow"
-            } else {
-
-                followDTO.followingCount = followDTO.followingCount + 1
-                followDTO.followings[uid] = true
-                followerNotification(uid, userName)
-            }
-            transaction.set(followingRef, followDTO)
-            return@runTransaction
-        }
 
         val followerRef = database.collection("followInfo").document(uid)
 
-        database.runTransaction{transaction ->
-            var followDTO: FollowDTO? = transaction.get(followerRef).toObject(FollowDTO::class.java)
+        database
+            .collection("followInfo")
+            .document(uid)
+            .get()
+            .addOnSuccessListener {
+                if(it != null && it.exists()) {
+                    val followDTO = it.toObject(FollowDTO::class.java)!!
 
-            if(followDTO == null){
-                followDTO = FollowDTO()
-                followDTO!!.followerCount = 1
-                followDTO!!.followers[auth.currentUser!!.uid] = true
-
-                transaction.set(followerRef, followDTO!!)
-
-                return@runTransaction
+                    if (followDTO.followers.containsKey(auth.currentUser!!.uid)){
+                        followDTO.followerCount = followDTO.followerCount - 1
+                        followDTO.followers.remove(auth.currentUser!!.uid)
+                    } else {
+                        followDTO.followerCount = followDTO.followerCount + 1
+                        followDTO.followers[auth.currentUser!!.uid] = true
+                    }
+                    followerRef.set(followDTO)
+                }
+                else{
+                    val followDTO = FollowDTO()
+                    followDTO.followerCount = 1
+                    followDTO.followers[auth.currentUser!!.uid] = true
+                    followerRef.set(followDTO)
+                }
             }
-
-            if (followDTO!!.followers.containsKey(auth.currentUser!!.uid)){
-                followDTO!!.followerCount = followDTO!!.followerCount - 1
-                followDTO!!.followers.remove(auth.currentUser!!.uid)
-            } else {
-                followDTO!!.followerCount = followDTO!!.followerCount + 1
-                followDTO!!.followers[auth.currentUser!!.uid] = true
-            }
-            transaction.set(followerRef, followDTO!!)
-            return@runTransaction
-        }
     }
 
     private fun followerNotification(destinationUid: String, userName:String) {
