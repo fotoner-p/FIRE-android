@@ -14,6 +14,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.article_item.view.*
 import moe.fotone.fire.utils.ArticleDTO
+import moe.fotone.fire.utils.FcmPush
 import moe.fotone.fire.utils.NotificationDTO
 import java.util.*
 import kotlin.collections.ArrayList
@@ -22,6 +23,8 @@ import kotlin.collections.ArrayList
 class ArticleRecyclerViewAdapter(private val activity: FragmentActivity, private val type: String): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val database by lazy { FirebaseFirestore.getInstance()}
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance()}
+    private val fcmpush by lazy {FcmPush()}
+
     lateinit var articleSnapshot: ListenerRegistration
 
     val articleDTOs: ArrayList<ArticleDTO>
@@ -169,6 +172,9 @@ class ArticleRecyclerViewAdapter(private val activity: FragmentActivity, private
         notificationDTO.timestamp = System.currentTimeMillis()
 
         FirebaseFirestore.getInstance().collection("notification").document().set(notificationDTO)
+
+        val message = name + "님이 좋아요를 눌렀습니다"
+        fcmpush.sendMessage(writerUid, "알림 메세지 입니다.", message)
     }
 
     override fun getItemCount(): Int = articleDTOs.size

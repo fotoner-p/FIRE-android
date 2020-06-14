@@ -18,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.android.synthetic.main.fragment_user.*
 import kotlinx.android.synthetic.main.fragment_user.view.*
+import moe.fotone.fire.utils.FcmPush
 import moe.fotone.fire.utils.FollowDTO
 import moe.fotone.fire.utils.NotificationDTO
 
@@ -25,11 +26,10 @@ import moe.fotone.fire.utils.NotificationDTO
 class FragmentUser: Fragment() {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val database by lazy { FirebaseFirestore.getInstance()}
+    private val fcmpush by lazy { FcmPush() }
 
     private lateinit var articleSnapshot: ListenerRegistration
     private lateinit var imageProfileListenerRegistration: ListenerRegistration
-    private lateinit var followingListenerRegistration: ListenerRegistration
-    private lateinit var followListenerRegistration: ListenerRegistration
 
     private lateinit var uid: String
 
@@ -116,35 +116,21 @@ class FragmentUser: Fragment() {
         super.onStop()
         articleSnapshot.remove()
         imageProfileListenerRegistration.remove()
-        followingListenerRegistration.remove()
-        followListenerRegistration.remove()
     }
 
     private fun getFollowInfo(){
         val query = database.collection("followInfo").document(uid)
 
-        followingListenerRegistration = query.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
-            if (documentSnapshot != null && documentSnapshot.exists()){
-                val followDTO = documentSnapshot.toObject(FollowDTO::class.java)
+        query.get().addOnCompleteListener { task ->
+            if(task.isSuccessful){
+                val followDTO = task.result?.toObject(FollowDTO::class.java)
 
-                userFollowingCountText.setText(followDTO?.followingCount.toString())
-            }
-            else
-                return@addSnapshotListener
-        }
+                userFollowingCountText.text = followDTO?.followingCount.toString()
+                userFollowerCountText.text = followDTO?.followerCount.toString()
 
-        followListenerRegistration = query.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
-
-            if (documentSnapshot != null && documentSnapshot.exists()){
-                val followDTO = documentSnapshot.toObject(FollowDTO::class.java)
-
-                userFollowerCountText.setText(followDTO?.followerCount.toString())
                 if (followDTO!!.followers.containsKey(auth.currentUser!!.uid)) {
                     userFollowBtn.text = "unfollow"
                 }
-            }
-            else{
-                return@addSnapshotListener
             }
         }
     }
@@ -176,7 +162,11 @@ class FragmentUser: Fragment() {
                                 followDTO.followings[uid] = true
                                 followerNotification(uid, userName)
                             }
-                            followingRef.set(followDTO)
+                            followingRef.set(followDTO).addOnCompleteListener {
+                                if(it.isSuccessful){
+                                    getFollowInfo()
+                                }
+                            }
                         }
                         else{
                             val followDTO = FollowDTO()
@@ -184,7 +174,11 @@ class FragmentUser: Fragment() {
                             followDTO.followings[uid] = true
                             followerNotification(uid, userName)
 
-                            followingRef.set(followDTO)
+                            followingRef.set(followDTO).addOnCompleteListener {
+                                if(it.isSuccessful){
+                                    getFollowInfo()
+                                }
+                            }
                         }
                     }
             }
@@ -226,6 +220,8 @@ class FragmentUser: Fragment() {
         notificationDTO.timestamp = System.currentTimeMillis()
 
         FirebaseFirestore.getInstance().collection("notification").document().set(notificationDTO)
-    }
 
+        val message = userName + "님이 방금 팔로우 했습니다"
+        fcmpush.sendMessage(destinationUid, "알림 메세지 입니다.", message)
+    }
 }

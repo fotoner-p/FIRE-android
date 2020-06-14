@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -43,6 +44,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         mainNavigation.setOnNavigationItemSelectedListener(this)
         mainNavigation.selectedItemId = R.id.navigation_home
+
+        registerPushToken()
     }
 
     override fun onStart() {
@@ -72,7 +75,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
             supportFragmentManager.beginTransaction()
                 .replace(R.id.content, fragment)
-                .commit()
+                .commitAllowingStateLoss()
 
             fragmentMap[item.itemId] = fragment
 
@@ -89,7 +92,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             }
             supportFragmentManager.beginTransaction()
                 .replace(R.id.content, fragmentMap[item.itemId]!!)
-                .commit()
+                .commitAllowingStateLoss()
 
             beforeSelected = item.itemId
 
@@ -121,8 +124,13 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         }
     }
 
-    private fun replaceFragment(fragment: Fragment){
-        val fragmentTransaction = supportFragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content, fragment).commitAllowingStateLoss();
+    fun registerPushToken(){
+        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
+            val pushToken = task.result?.token
+            val uid = auth.currentUser?.uid
+            val map = mutableMapOf<String,Any>()
+            map["pushtoken"] = pushToken!!
+            database.collection("pushtokens").document(uid!!).set(map)
+        }
     }
 }

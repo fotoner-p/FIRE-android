@@ -14,12 +14,15 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.android.synthetic.main.fragment_detail.*
 import kotlinx.android.synthetic.main.fragment_detail.view.*
 import moe.fotone.fire.utils.ArticleDTO
+import moe.fotone.fire.utils.FcmPush
 import moe.fotone.fire.utils.NotificationDTO
 import java.util.*
 
 class FragmentDetail: Fragment() {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance()}
     private val database: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
+    private val fcmpush by lazy { FcmPush() }
+
     private lateinit var articleSnapshot: ListenerRegistration
     private lateinit var imageProfileListenerRegistration: ListenerRegistration
     private lateinit var articleUid:String
@@ -182,6 +185,10 @@ class FragmentDetail: Fragment() {
         notificationDTO.timestamp = System.currentTimeMillis()
 
         FirebaseFirestore.getInstance().collection("notification").document().set(notificationDTO)
+
+        val message = name + "님이 좋아요를 눌렀습니다"
+        fcmpush.sendMessage(writerUid, "알림 메세지 입니다.", message)
+
     }
     private fun commentNotification(name:String, message:String){
         if(writerUid == auth.currentUser!!.uid)
@@ -196,5 +203,8 @@ class FragmentDetail: Fragment() {
         notificationDTO.timestamp = System.currentTimeMillis()
 
         FirebaseFirestore.getInstance().collection("notification").document().set(notificationDTO)
+
+        val send_message = name + "님이 \"" + message + "\" 메세지를 남겼습니다"
+        fcmpush.sendMessage(writerUid, "알림 메세지 입니다.", send_message)
     }
 }
