@@ -104,16 +104,17 @@ class FragmentDetail: Fragment() {
 
     override fun onResume() {
         super.onResume()
+        val activity = requireActivity()
         detailComentListView.layoutManager = LinearLayoutManager(context)
-        detailComentListView.adapter = CommentRecyclerViewAdapter(requireActivity(), articleUid)
+        detailComentListView.adapter = CommentRecyclerViewAdapter(activity, articleUid)
 
-        requireActivity().mainProgressBar.visibility = View.INVISIBLE
-        requireActivity().toolbarTitleText.text = "Article"
-        requireActivity().toolbarTitleText.visibility = View.VISIBLE
-        requireActivity().toolbarBackImage.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStackImmediate()
+        activity.mainProgressBar.visibility = View.INVISIBLE
+        activity.toolbarTitleText.text = "Article"
+        activity.toolbarTitleText.visibility = View.VISIBLE
+        activity.toolbarBackImage.setOnClickListener {
+            activity.supportFragmentManager.popBackStackImmediate()
         }
-        requireActivity().toolbarBackImage.visibility = View.VISIBLE
+        activity.toolbarBackImage.visibility = View.VISIBLE
 
         articleSnapshot = (detailComentListView.adapter as CommentRecyclerViewAdapter).articleSnapshot
         getProfileImage()

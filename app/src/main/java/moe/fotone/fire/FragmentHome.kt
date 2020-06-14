@@ -32,14 +32,16 @@ class FragmentHome: Fragment() {
 
     override fun onResume() {
         super.onResume()
+        val activity = requireActivity()
+
         homeListView.layoutManager = LinearLayoutManager(context)
-        homeListView.adapter = ArticleRecyclerViewAdapter(requireActivity(), "main")
+        homeListView.adapter = ArticleRecyclerViewAdapter(activity, "main")
         articleSnapshot = (homeListView.adapter as ArticleRecyclerViewAdapter).articleSnapshot
 
-        requireActivity().mainProgressBar.visibility = View.INVISIBLE
-        requireActivity().toolbarTitleText.text = "Home"
-        requireActivity().toolbarTitleText.visibility = View.VISIBLE
-        requireActivity().toolbarBackImage.visibility = View.INVISIBLE
+        activity.mainProgressBar.visibility = View.INVISIBLE
+        activity.toolbarTitleText.text = "Home"
+        activity.toolbarTitleText.visibility = View.VISIBLE
+        activity.toolbarBackImage.visibility = View.INVISIBLE
     }
 
     override fun onStop() {

@@ -33,11 +33,12 @@ class FragmentNotifications: Fragment() {
 
     override fun onResume() {
         super.onResume()
+        val activity = requireActivity()
 
-        requireActivity().mainProgressBar.visibility = View.INVISIBLE
-        requireActivity().toolbarTitleText.text = "Notification"
-        requireActivity().toolbarTitleText.visibility = View.VISIBLE
-        requireActivity().toolbarBackImage.visibility = View.INVISIBLE
+        activity.mainProgressBar.visibility = View.INVISIBLE
+        activity.toolbarTitleText.text = "Notification"
+        activity.toolbarTitleText.visibility = View.VISIBLE
+        activity.toolbarBackImage.visibility = View.INVISIBLE
     }
 
     inner class NotificationRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

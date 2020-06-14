@@ -102,19 +102,20 @@ class FragmentUser: Fragment() {
 
     override fun onResume() {
         super.onResume()
+        val activity = requireActivity()
         userListview.layoutManager = LinearLayoutManager(context)
-        userListview.adapter = ArticleRecyclerViewAdapter(requireActivity(), uid)
+        userListview.adapter = ArticleRecyclerViewAdapter(activity, uid)
         articleSnapshot = (userListview.adapter as ArticleRecyclerViewAdapter).articleSnapshot
         getProfileImage()
 
-        if(requireActivity().supportFragmentManager.backStackEntryCount > 0){
-            requireActivity().toolbarBackImage.setOnClickListener {
-                requireActivity().supportFragmentManager.popBackStackImmediate()
+        if(activity.supportFragmentManager.backStackEntryCount > 0){
+            activity.toolbarBackImage.setOnClickListener {
+                activity.supportFragmentManager.popBackStackImmediate()
             }
-            requireActivity().toolbarBackImage.visibility = View.VISIBLE
+            activity.toolbarBackImage.visibility = View.VISIBLE
         }
         else{
-            requireActivity().toolbarBackImage.visibility = View.INVISIBLE
+            activity.toolbarBackImage.visibility = View.INVISIBLE
         }
     }
 
