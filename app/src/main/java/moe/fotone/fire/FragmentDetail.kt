@@ -11,6 +11,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_detail.*
 import kotlinx.android.synthetic.main.fragment_detail.view.*
 import moe.fotone.fire.utils.ArticleDTO
@@ -105,6 +106,15 @@ class FragmentDetail: Fragment() {
         super.onResume()
         detailComentListView.layoutManager = LinearLayoutManager(context)
         detailComentListView.adapter = CommentRecyclerViewAdapter(requireActivity(), articleUid)
+
+        requireActivity().mainProgressBar.visibility = View.INVISIBLE
+        requireActivity().toolbarTitleText.text = "Article"
+        requireActivity().toolbarTitleText.visibility = View.VISIBLE
+        requireActivity().toolbarBackImage.setOnClickListener {
+            requireActivity().supportFragmentManager.popBackStackImmediate()
+        }
+        requireActivity().toolbarBackImage.visibility = View.VISIBLE
+
         articleSnapshot = (detailComentListView.adapter as CommentRecyclerViewAdapter).articleSnapshot
         getProfileImage()
     }

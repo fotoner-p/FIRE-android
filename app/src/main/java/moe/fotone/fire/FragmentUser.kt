@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_user.*
 import kotlinx.android.synthetic.main.fragment_user.view.*
 import moe.fotone.fire.utils.FcmPush
@@ -68,11 +69,19 @@ class FragmentUser: Fragment() {
                     )
                 }
             }
+
+            requireActivity().mainProgressBar.visibility = View.INVISIBLE
+            requireActivity().toolbarTitleText.text = "Account"
+            requireActivity().toolbarTitleText.visibility = View.VISIBLE
+
         }
         else{
             view.userFollowBtn.setOnClickListener {
                 requestFollow()
             }
+            requireActivity().mainProgressBar.visibility = View.INVISIBLE
+            requireActivity().toolbarTitleText.text = "User"
+            requireActivity().toolbarTitleText.visibility = View.VISIBLE
         }
 
         database.collection("user")
@@ -97,6 +106,16 @@ class FragmentUser: Fragment() {
         userListview.adapter = ArticleRecyclerViewAdapter(requireActivity(), uid)
         articleSnapshot = (userListview.adapter as ArticleRecyclerViewAdapter).articleSnapshot
         getProfileImage()
+
+        if(requireActivity().supportFragmentManager.backStackEntryCount > 0){
+            requireActivity().toolbarBackImage.setOnClickListener {
+                requireActivity().supportFragmentManager.popBackStackImmediate()
+            }
+            requireActivity().toolbarBackImage.visibility = View.VISIBLE
+        }
+        else{
+            requireActivity().toolbarBackImage.visibility = View.INVISIBLE
+        }
     }
 
     private fun getProfileImage() {

@@ -21,8 +21,13 @@
             android:name=".MainActivity"
             android:theme="@style/MainTheme"
             android:label="@string/title_activity_main" />
-        <activity android:name=".JoinActivity" />
-        <activity android:name=".LoginActivity">
+        <activity
+            android:name=".JoinActivity"
+            android:label="Sign In"
+            android:parentActivityName=".LoginActivity" />
+
+        <activity android:name=".LoginActivity"
+            android:label="Poto.net">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

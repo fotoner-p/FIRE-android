@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -27,10 +28,13 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        mainProgressBar.visibility = View.VISIBLE
+
         fragmentMap[R.id.navigation_home] = FragmentHome()
         fragmentMap[R.id.navigation_dashboard] = FragmentDashboard()
         fragmentMap[R.id.navigation_notifications] = FragmentNotifications()
         fragmentMap[R.id.navigation_account] = FragmentUser()
+
 
         val bundle = Bundle()
         bundle.putString("destinationUid", auth.currentUser!!.uid)
@@ -46,6 +50,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         mainNavigation.selectedItemId = R.id.navigation_home
 
         registerPushToken()
+        mainProgressBar.visibility = View.VISIBLE
     }
 
     override fun onStart() {

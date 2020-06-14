@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_home.view.*
 
@@ -34,6 +35,11 @@ class FragmentHome: Fragment() {
         homeListView.layoutManager = LinearLayoutManager(context)
         homeListView.adapter = ArticleRecyclerViewAdapter(requireActivity(), "main")
         articleSnapshot = (homeListView.adapter as ArticleRecyclerViewAdapter).articleSnapshot
+
+        requireActivity().mainProgressBar.visibility = View.INVISIBLE
+        requireActivity().toolbarTitleText.text = "Home"
+        requireActivity().toolbarTitleText.visibility = View.VISIBLE
+        requireActivity().toolbarBackImage.visibility = View.INVISIBLE
     }
 
     override fun onStop() {

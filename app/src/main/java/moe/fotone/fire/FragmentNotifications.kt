@@ -11,11 +11,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.comment_item.view.*
 import kotlinx.android.synthetic.main.fragment_notifications.view.*
 import moe.fotone.fire.utils.NotificationDTO
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 class FragmentNotifications: Fragment() {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
@@ -29,6 +31,14 @@ class FragmentNotifications: Fragment() {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        requireActivity().mainProgressBar.visibility = View.INVISIBLE
+        requireActivity().toolbarTitleText.text = "Notification"
+        requireActivity().toolbarTitleText.visibility = View.VISIBLE
+        requireActivity().toolbarBackImage.visibility = View.INVISIBLE
+    }
 
     inner class NotificationRecyclerViewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         val notificationDTOList = ArrayList<NotificationDTO>()
