@@ -1,4 +1,4 @@
-package moe.fotone.fire
+package moe.fotone.fire.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.comment_item.view.*
 import kotlinx.android.synthetic.main.fragment_notifications.view.*
+import moe.fotone.fire.R
 import moe.fotone.fire.utils.NotificationDTO
 import java.util.*
 import kotlin.collections.ArrayList
@@ -66,7 +67,7 @@ class FragmentNotifications: Fragment() {
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            val viewHolder = (holder as NotificationRecyclerViewAdapter.CustomViewHolder).itemView
+            val viewHolder = (holder as CustomViewHolder).itemView
             val calendar = Calendar.getInstance()
 
             calendar.timeInMillis = notificationDTOList[position].timestamp!!

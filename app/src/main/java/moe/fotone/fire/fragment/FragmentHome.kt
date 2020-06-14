@@ -1,4 +1,4 @@
-package moe.fotone.fire
+package moe.fotone.fire.fragment
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +11,9 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_home.view.*
+import moe.fotone.fire.adapter.ArticleRecyclerViewAdapter
+import moe.fotone.fire.R
+import moe.fotone.fire.WriteActivity
 
 
 class FragmentHome: Fragment() {
@@ -35,7 +38,8 @@ class FragmentHome: Fragment() {
         val activity = requireActivity()
 
         homeListView.layoutManager = LinearLayoutManager(context)
-        homeListView.adapter = ArticleRecyclerViewAdapter(activity, "main")
+        homeListView.adapter =
+            ArticleRecyclerViewAdapter(activity, "main")
         articleSnapshot = (homeListView.adapter as ArticleRecyclerViewAdapter).articleSnapshot
 
         activity.mainProgressBar.visibility = View.INVISIBLE

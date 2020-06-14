@@ -16,6 +16,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_main.*
+import moe.fotone.fire.fragment.FragmentDashboard
+import moe.fotone.fire.fragment.FragmentHome
+import moe.fotone.fire.fragment.FragmentNotifications
+import moe.fotone.fire.fragment.FragmentUser
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
@@ -69,7 +73,9 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             R.id.navigation_home -> {
                 supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 supportFragmentManager.beginTransaction()
-                    .replace(R.id.content, FragmentHome())
+                    .replace(R.id.content,
+                        FragmentHome()
+                    )
                     .commitAllowingStateLoss()
 
                 return true
@@ -77,7 +83,9 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             R.id.navigation_dashboard -> {
                 supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 supportFragmentManager.beginTransaction()
-                    .replace(R.id.content, FragmentDashboard())
+                    .replace(R.id.content,
+                        FragmentDashboard()
+                    )
                     .commitAllowingStateLoss()
 
                 return true
@@ -85,7 +93,9 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             R.id.navigation_notifications -> {
                 supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 supportFragmentManager.beginTransaction()
-                    .replace(R.id.content, FragmentNotifications())
+                    .replace(R.id.content,
+                        FragmentNotifications()
+                    )
                     .commitAllowingStateLoss()
 
                 return true

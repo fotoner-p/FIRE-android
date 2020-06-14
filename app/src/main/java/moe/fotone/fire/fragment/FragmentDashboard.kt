@@ -1,4 +1,4 @@
-package moe.fotone.fire
+package moe.fotone.fire.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,6 +17,7 @@ import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.article_item.view.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
+import moe.fotone.fire.R
 import moe.fotone.fire.utils.ArticleDTO
 import moe.fotone.fire.utils.FcmPush
 import moe.fotone.fire.utils.FollowDTO
@@ -162,7 +163,8 @@ class FragmentDashboard: Fragment() {
 
                 bundle.putString("destinationUid", articleDTOs[position].uid)
                 fragment.arguments = bundle
-                transaction.replace(R.id.content, fragment).addToBackStack(null).replace(R.id.content, fragment).commit()
+                transaction.replace(R.id.content, fragment).addToBackStack(null).replace(
+                    R.id.content, fragment).commit()
             }
 
 
@@ -179,7 +181,8 @@ class FragmentDashboard: Fragment() {
                 bundle.putString("articleUid", articleUidList[position])
 
                 fragment.arguments = bundle
-                transaction.replace(R.id.content, fragment).addToBackStack(null).replace(R.id.content, fragment).commit()
+                transaction.replace(R.id.content, fragment).addToBackStack(null).replace(
+                    R.id.content, fragment).commit()
             }
         }
         private fun favoriteEvent(position: Int){

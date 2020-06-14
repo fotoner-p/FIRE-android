@@ -1,4 +1,4 @@
-package moe.fotone.fire
+package moe.fotone.fire.fragment
 
 import android.Manifest
 import android.content.Intent
@@ -19,6 +19,9 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_user.*
 import kotlinx.android.synthetic.main.fragment_user.view.*
+import moe.fotone.fire.adapter.ArticleRecyclerViewAdapter
+import moe.fotone.fire.LoginActivity
+import moe.fotone.fire.R
 import moe.fotone.fire.utils.FcmPush
 import moe.fotone.fire.utils.FollowDTO
 import moe.fotone.fire.utils.NotificationDTO
@@ -103,7 +106,8 @@ class FragmentUser: Fragment() {
         super.onResume()
         val activity = requireActivity()
         userListview.layoutManager = LinearLayoutManager(context)
-        userListview.adapter = ArticleRecyclerViewAdapter(activity, uid)
+        userListview.adapter =
+            ArticleRecyclerViewAdapter(activity, uid)
         articleSnapshot = (userListview.adapter as ArticleRecyclerViewAdapter).articleSnapshot
         getProfileImage()
 

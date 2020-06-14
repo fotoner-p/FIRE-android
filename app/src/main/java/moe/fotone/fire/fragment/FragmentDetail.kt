@@ -1,4 +1,4 @@
-package moe.fotone.fire
+package moe.fotone.fire.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,9 +13,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_write.*
 import kotlinx.android.synthetic.main.fragment_detail.*
 import kotlinx.android.synthetic.main.fragment_detail.view.*
+import moe.fotone.fire.adapter.CommentRecyclerViewAdapter
+import moe.fotone.fire.R
 import moe.fotone.fire.utils.ArticleDTO
 import moe.fotone.fire.utils.FcmPush
 import moe.fotone.fire.utils.NotificationDTO
@@ -48,7 +49,8 @@ class FragmentDetail: Fragment() {
 
             bundle.putString("destinationUid", writerUid)
             fragment.arguments = bundle
-            transaction.replace(R.id.content, fragment).addToBackStack(null).replace(R.id.content, fragment).commit()
+            transaction.replace(R.id.content, fragment).addToBackStack(null).replace(
+                R.id.content, fragment).commit()
         }
 
         view.commentSendBtn.setOnClickListener {
@@ -108,7 +110,11 @@ class FragmentDetail: Fragment() {
         super.onResume()
         val activity = requireActivity()
         detailComentListView.layoutManager = LinearLayoutManager(context)
-        detailComentListView.adapter = CommentRecyclerViewAdapter(activity, articleUid)
+        detailComentListView.adapter =
+            CommentRecyclerViewAdapter(
+                activity,
+                articleUid
+            )
 
         activity.mainProgressBar.visibility = View.INVISIBLE
         activity.toolbarTitleText.text = "Article"
