@@ -100,7 +100,7 @@
                             android:id="@+id/userAritcleCountText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="765"
+                            android:text="0"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -117,10 +117,10 @@
                             android:text="Follower" />
 
                         <TextView
-                            android:id="@+id/account_tv_follower_count"
+                            android:id="@+id/userFollowerCountText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="765"
+                            android:text="0"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -137,10 +137,10 @@
                             android:text="Following" />
 
                         <TextView
-                            android:id="@+id/account_tv_following_count"
+                            android:id="@+id/userFollowingCountText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="765"
+                            android:text="0"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
