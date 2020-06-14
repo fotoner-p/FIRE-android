@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -12,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_write.*
 import kotlinx.android.synthetic.main.fragment_detail.*
 import kotlinx.android.synthetic.main.fragment_detail.view.*
 import moe.fotone.fire.utils.ArticleDTO
@@ -140,6 +142,14 @@ class FragmentDetail: Fragment() {
     }
 
     private fun sendComment(){
+        if (commentText.text.toString().length == 0){
+            Toast.makeText(requireActivity(),"코멘트를 작성해주세요" , Toast.LENGTH_SHORT).show()
+            return
+        }else if(commentText.text.toString().length > 150) {
+            Toast.makeText(requireActivity(),"150자 이내로 작성해주세요" , Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val docRef = database.collection("articles").document(articleUid)
         val userRef = database.collection("user").document(auth.currentUser!!.uid)
         database.runTransaction{transaction ->

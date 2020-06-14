@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -54,6 +55,17 @@ class WriteActivity : AppCompatActivity() {
     }
 
     fun articleUpload(){
+        if (writeTextMain.text.toString().length == 0 && photoUri == null){
+            Toast.makeText(this,"게시글을 작성해주세요" , Toast.LENGTH_SHORT).show()
+            return
+        }else if(writeTextMain.text.toString().length > 150) {
+            Toast.makeText(this,"150자 이내로 작성해주세요" , Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        sendBtn.isEnabled = false
+        addPhotoImage.isEnabled = false
+
         val userRef = database.collection("user").document(auth.currentUser!!.uid)
         userRef.get()
             .addOnSuccessListener { document ->
@@ -74,6 +86,8 @@ class WriteActivity : AppCompatActivity() {
                             storageRef.downloadUrl.addOnCompleteListener {task ->
                                 article.imageUrl = task.result.toString()
                                 database.collection("articles").document().set(article)
+                                sendBtn.isEnabled = true
+                                addPhotoImage.isEnabled = true
                                 setResult(Activity.RESULT_OK)
                                 finish()
                             }
@@ -81,6 +95,8 @@ class WriteActivity : AppCompatActivity() {
                 }
                 else {
                     database.collection("articles").document().set(article)
+                    sendBtn.isEnabled = true
+                    addPhotoImage.isEnabled = true
                     setResult(Activity.RESULT_OK)
                     finish()
                 }

@@ -42,7 +42,6 @@ class FragmentUser: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_user, container, false)
-        view.userArticleRelativeLayout.isNestedScrollingEnabled = false
 
         uid = arguments?.getString("destinationUid").toString()
 
@@ -108,6 +107,7 @@ class FragmentUser: Fragment() {
         articleSnapshot = (userListview.adapter as ArticleRecyclerViewAdapter).articleSnapshot
         getProfileImage()
 
+        println(activity.supportFragmentManager.backStackEntryCount)
         if(activity.supportFragmentManager.backStackEntryCount > 0){
             activity.toolbarBackImage.setOnClickListener {
                 activity.supportFragmentManager.popBackStackImmediate()
@@ -145,8 +145,10 @@ class FragmentUser: Fragment() {
             if(task.isSuccessful){
                 val followDTO = task.result?.toObject(FollowDTO::class.java)
 
-                userFollowingCountText.text = followDTO?.followingCount.toString()
-                userFollowerCountText.text = followDTO?.followerCount.toString()
+                if(userFollowingCountText.text != null) {
+                    userFollowingCountText.text = followDTO?.followingCount.toString()
+                    userFollowerCountText.text = followDTO?.followerCount.toString()
+                }
 
                 if (followDTO!!.followers.containsKey(auth.currentUser!!.uid)) {
                     userFollowBtn.text = "unfollow"

@@ -9,6 +9,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -20,7 +21,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val database by lazy { FirebaseFirestore.getInstance()}
     private val storage by lazy { FirebaseStorage.getInstance() }
-    private var beforeSelected: Int = R.id.navigation_home
+    //private var beforeSelected: Int = R.id.navigation_home
     private val fragmentMap: HashMap<Int, Fragment?> = HashMap()
     private val PICK_PROFILE_FROM_ALBUM = 10
 
@@ -29,7 +30,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         setContentView(R.layout.activity_main)
 
         mainProgressBar.visibility = View.VISIBLE
-
+        /*
         fragmentMap[R.id.navigation_home] = FragmentHome()
         fragmentMap[R.id.navigation_dashboard] = FragmentDashboard()
         fragmentMap[R.id.navigation_notifications] = FragmentNotifications()
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         val bundle = Bundle()
         bundle.putString("destinationUid", auth.currentUser!!.uid)
         fragmentMap[R.id.navigation_account]?.arguments = bundle
+        */
 
         ActivityCompat.requestPermissions(
             this,
@@ -63,46 +65,46 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        if(beforeSelected == item.itemId){
-            lateinit var fragment: Fragment
+        when(item.itemId){
+            R.id.navigation_home -> {
+                supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.content, FragmentHome())
+                    .commitAllowingStateLoss()
 
-            when(item.itemId){
-                R.id.navigation_home -> fragment =  FragmentHome()
-                R.id.navigation_dashboard -> fragment = FragmentDashboard()
-                R.id.navigation_notifications -> fragment = FragmentNotifications()
-                R.id.navigation_account -> {
-                    fragment = FragmentUser()
-                    val bundle = Bundle()
-                    bundle.putString("destinationUid", auth.currentUser!!.uid)
-                    fragment.arguments = bundle
-                }
+                return true
             }
+            R.id.navigation_dashboard -> {
+                supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.content, FragmentDashboard())
+                    .commitAllowingStateLoss()
 
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.content, fragment)
-                .commitAllowingStateLoss()
-
-            fragmentMap[item.itemId] = fragment
-
-            beforeSelected = item.itemId
-
-            return true
-        }
-        else{
-            for (fragment in supportFragmentManager.fragments){
-                if(fragment != null && fragment.isVisible) {
-                    fragmentMap[beforeSelected] = fragment
-                    break
-                }
+                return true
             }
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.content, fragmentMap[item.itemId]!!)
-                .commitAllowingStateLoss()
+            R.id.navigation_notifications -> {
+                supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.content, FragmentNotifications())
+                    .commitAllowingStateLoss()
 
-            beforeSelected = item.itemId
+                return true
+            }
+            R.id.navigation_account -> {
+                supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                val fragment = FragmentUser()
+                val bundle = Bundle()
+                bundle.putString("destinationUid", auth.currentUser!!.uid)
+                fragment.arguments = bundle
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.content, fragment)
+                    .commitAllowingStateLoss()
 
-            return true
+                return true
+            }
         }
+
+        return false
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
