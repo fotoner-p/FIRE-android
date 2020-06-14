@@ -19,15 +19,18 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.android.synthetic.main.fragment_user.*
 import kotlinx.android.synthetic.main.fragment_user.view.*
 import moe.fotone.fire.utils.FollowDTO
+import moe.fotone.fire.utils.NotificationDTO
 
 
 class FragmentUser: Fragment() {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val database by lazy { FirebaseFirestore.getInstance()}
+
     private lateinit var articleSnapshot: ListenerRegistration
     private lateinit var imageProfileListenerRegistration: ListenerRegistration
     private lateinit var followingListenerRegistration: ListenerRegistration
     private lateinit var followListenerRegistration: ListenerRegistration
+
     private lateinit var uid: String
 
     private val PICK_PROFILE_FROM_ALBUM = 10
@@ -113,41 +116,51 @@ class FragmentUser: Fragment() {
         super.onStop()
         articleSnapshot.remove()
         imageProfileListenerRegistration.remove()
+        followingListenerRegistration.remove()
+        followListenerRegistration.remove()
     }
 
     private fun getFollowInfo(){
         val query = database.collection("followInfo").document(uid)
 
         followingListenerRegistration = query.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
-            val followDTO = documentSnapshot?.toObject(FollowDTO::class.java)
-
-            if (followDTO == null) return@addSnapshotListener
-
-            userFollowingCountText.text = followDTO.followingCount.toString()
+            if (documentSnapshot != null && documentSnapshot.exists()){
+                val followDTO = documentSnapshot.toObject(FollowDTO::class.java)
+                println(followDTO)
+                userFollowingCountText.setText(followDTO?.followingCount.toString())
+            }
+            else
+                return@addSnapshotListener
         }
 
         followListenerRegistration = query.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
-            val followDTO = documentSnapshot?.toObject(FollowDTO::class.java)
 
-            if (followDTO == null) return@addSnapshotListener
-
-            userFollowerCountText.text = followDTO.followerCount.toString()
-            if (followDTO.followers.containsKey(auth.currentUser!!.uid)) {
-
-                userFollowBtn.text = "unfollow"
+            if (documentSnapshot != null && documentSnapshot.exists()){
+                val followDTO = documentSnapshot.toObject(FollowDTO::class.java)
+                println(followDTO)
+                userFollowerCountText.setText(followDTO?.followerCount.toString())
+                if (followDTO!!.followers.containsKey(auth.currentUser!!.uid)) {
+                    userFollowBtn.text = "unfollow"
+                }
+            }
+            else{
+                return@addSnapshotListener
             }
         }
     }
     private fun requestFollow(){
         val followingRef = database.collection("followInfo").document(auth.currentUser!!.uid)
+        val userRef = database.collection("user").document(auth.currentUser!!.uid)
 
         database.runTransaction{transaction ->
             var followDTO: FollowDTO? = transaction.get(followingRef).toObject(FollowDTO::class.java)
+            var userName = transaction.get(userRef)["name"].toString()
 
             if(followDTO == null){
                 followDTO = FollowDTO()
                 followDTO.followingCount = 1
                 followDTO.followings[uid] = true
+                followerNotification(uid, userName)
 
                 transaction.set(followingRef, followDTO)
 
@@ -163,7 +176,7 @@ class FragmentUser: Fragment() {
 
                 followDTO.followingCount = followDTO.followingCount + 1
                 followDTO.followings[uid] = true
-                //followerAlarm(uid!!)
+                followerNotification(uid, userName)
             }
             transaction.set(followingRef, followDTO)
             return@runTransaction
@@ -188,14 +201,23 @@ class FragmentUser: Fragment() {
                 followDTO!!.followerCount = followDTO!!.followerCount - 1
                 followDTO!!.followers.remove(auth.currentUser!!.uid)
             } else {
-
                 followDTO!!.followerCount = followDTO!!.followerCount + 1
                 followDTO!!.followers[auth.currentUser!!.uid] = true
-                //followerAlarm(uid!!)
             }
             transaction.set(followerRef, followDTO!!)
             return@runTransaction
         }
+    }
+
+    private fun followerNotification(destinationUid: String, userName:String) {
+        val notificationDTO = NotificationDTO()
+        notificationDTO.targetUID = destinationUid
+        notificationDTO.startName = userName
+        notificationDTO.startUID = auth.currentUser!!.uid
+        notificationDTO.kind = 2
+        notificationDTO.timestamp = System.currentTimeMillis()
+
+        FirebaseFirestore.getInstance().collection("notification").document().set(notificationDTO)
     }
 
 }

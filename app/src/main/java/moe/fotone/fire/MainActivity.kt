@@ -29,6 +29,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         fragmentMap[R.id.navigation_home] = FragmentHome()
         fragmentMap[R.id.navigation_dashboard] = FragmentDashboard()
         fragmentMap[R.id.navigation_notifications] = FragmentNotifications()
+        fragmentMap[R.id.navigation_account] = FragmentUser()
+
+        val bundle = Bundle()
+        bundle.putString("destinationUid", auth.currentUser!!.uid)
+        fragmentMap[R.id.navigation_account]?.arguments = bundle
 
         ActivityCompat.requestPermissions(
             this,
@@ -57,6 +62,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 R.id.navigation_home -> fragment =  FragmentHome()
                 R.id.navigation_dashboard -> fragment = FragmentDashboard()
                 R.id.navigation_notifications -> fragment = FragmentNotifications()
+                R.id.navigation_account -> {
+                    fragment = FragmentUser()
+                    val bundle = Bundle()
+                    bundle.putString("destinationUid", auth.currentUser!!.uid)
+                    fragment.arguments = bundle
+                }
             }
 
             supportFragmentManager.beginTransaction()

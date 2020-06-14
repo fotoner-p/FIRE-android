@@ -11,10 +11,10 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import kotlinx.android.synthetic.main.article_item.view.*
 import kotlinx.android.synthetic.main.fragment_detail.*
 import kotlinx.android.synthetic.main.fragment_detail.view.*
 import moe.fotone.fire.utils.ArticleDTO
+import moe.fotone.fire.utils.NotificationDTO
 import java.util.*
 
 class FragmentDetail: Fragment() {
@@ -144,16 +144,19 @@ class FragmentDetail: Fragment() {
             transaction.set(docRef, articleDTO)
             transaction.set(docRef.collection("comments").document(), comment)
 
+            commentNotification(name, commentText.text.toString())
             commentText.setText("")
         }
     }
 
     private fun favoriteEvent(articleUid: String){
-        val tsDoc = database.collection("articles").document(articleUid)
+        val articleRef = database.collection("articles").document(articleUid)
+        val userRef = database.collection("user").document(auth.currentUser!!.uid)
 
         database.runTransaction { transaction ->
             val uid = auth.currentUser!!.uid
-            val articleDTO = transaction.get(tsDoc).toObject(ArticleDTO::class.java)
+            val articleDTO = transaction.get(articleRef).toObject(ArticleDTO::class.java)
+            val userName = transaction.get(userRef)["name"].toString()
 
             if(articleDTO!!.favorites.containsKey(uid)){
                 articleDTO.favoriteCount -= 1
@@ -161,8 +164,37 @@ class FragmentDetail: Fragment() {
             } else {
                 articleDTO.favoriteCount += 1
                 articleDTO.favorites[uid] = true
+                favoriteNotification(userName)
             }
-            transaction.set(tsDoc, articleDTO)
+            transaction.set(articleRef, articleDTO)
         }
+    }
+
+    private fun favoriteNotification(name:String){
+        if(writerUid == auth.currentUser!!.uid)
+            return
+
+        val notificationDTO = NotificationDTO()
+        notificationDTO.targetUID = writerUid
+        notificationDTO.startName = name
+        notificationDTO.startUID = auth.currentUser!!.uid
+        notificationDTO.kind = 0
+        notificationDTO.timestamp = System.currentTimeMillis()
+
+        FirebaseFirestore.getInstance().collection("notification").document().set(notificationDTO)
+    }
+    private fun commentNotification(name:String, message:String){
+        if(writerUid == auth.currentUser!!.uid)
+            return
+
+        val notificationDTO = NotificationDTO()
+        notificationDTO.targetUID = writerUid
+        notificationDTO.startName = name
+        notificationDTO.startUID = auth.currentUser!!.uid
+        notificationDTO.kind = 1
+        notificationDTO.message = message
+        notificationDTO.timestamp = System.currentTimeMillis()
+
+        FirebaseFirestore.getInstance().collection("notification").document().set(notificationDTO)
     }
 }

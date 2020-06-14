@@ -14,6 +14,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import kotlinx.android.synthetic.main.article_item.view.*
 import moe.fotone.fire.utils.ArticleDTO
+import moe.fotone.fire.utils.NotificationDTO
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -138,21 +139,38 @@ class ArticleRecyclerViewAdapter(private val activity: FragmentActivity, private
     }
     private fun favoriteEvent(position: Int){
         val docRef = database.collection("articles").document(articleUidList[position])
+        val userRef = database.collection("user").document(auth.currentUser!!.uid)
 
         database.runTransaction { transaction ->
             val uid = auth.currentUser!!.uid
             val articleDTO = transaction.get(docRef).toObject(ArticleDTO::class.java)
-
+            val userName = transaction.get(userRef)["name"].toString()
             if(articleDTO!!.favorites.containsKey(uid)){
                 articleDTO.favoriteCount -= 1
                 articleDTO.favorites.remove(uid)
             } else {
                 articleDTO.favoriteCount += 1
                 articleDTO.favorites[uid] = true
+                favoriteNotification(userName, articleDTOs[position].uid!!)
             }
             transaction.set(docRef, articleDTO)
         }
     }
+
+    private fun favoriteNotification(name:String, writerUid:String){
+        if(writerUid == auth.currentUser!!.uid)
+            return
+
+        val notificationDTO = NotificationDTO()
+        notificationDTO.targetUID = writerUid
+        notificationDTO.startName = name
+        notificationDTO.startUID = auth.currentUser!!.uid
+        notificationDTO.kind = 0
+        notificationDTO.timestamp = System.currentTimeMillis()
+
+        FirebaseFirestore.getInstance().collection("notification").document().set(notificationDTO)
+    }
+
     override fun getItemCount(): Int = articleDTOs.size
 
     inner class CustomViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
