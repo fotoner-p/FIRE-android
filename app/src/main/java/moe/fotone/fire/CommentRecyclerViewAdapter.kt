@@ -27,7 +27,7 @@ class CommentRecyclerViewAdapter(private val activity: FragmentActivity, private
     }
 
     private fun getCotents() {
-        val query = database.collection("articles").document(aid).collection("comments").orderBy("timestamp", Query.Direction.DESCENDING)
+        val query = database.collection("articles").document(aid).collection("comments").orderBy("timestamp", Query.Direction.ASCENDING)
 
         articleSnapshot = query.addSnapshotListener{ querySnapshot, firebaseFirestoreException ->
             commentDTOs.clear()
