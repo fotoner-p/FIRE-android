@@ -146,7 +146,7 @@ class FragmentUser: Fragment() {
         val query = database.collection("followInfo").document(uid)
 
         query.get().addOnCompleteListener { task ->
-            if(task.isSuccessful){
+            if(task.isSuccessful && task.result!!.exists()){
                 val followDTO = task.result?.toObject(FollowDTO::class.java)
 
                 if(userFollowingCountText.text != null) {
@@ -154,7 +154,7 @@ class FragmentUser: Fragment() {
                     userFollowerCountText.text = followDTO?.followerCount.toString()
                 }
 
-                if (followDTO!!.followers.containsKey(auth.currentUser!!.uid)) {
+                if (followDTO!!.followers.containsKey(auth.currentUser!!.uid) && uid != auth.currentUser!!.uid) {
                     userFollowBtn.text = "unfollow"
                 }
             }
