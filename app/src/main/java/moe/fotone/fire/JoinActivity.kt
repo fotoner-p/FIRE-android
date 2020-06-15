@@ -27,7 +27,9 @@ class JoinActivity : AppCompatActivity() {
 
             if (pwd != repwd){
                 Toast.makeText(this,"패스워드가 서로 틀립니다" , Toast.LENGTH_SHORT).show()
-            } else {
+            } else if (pwd.isEmpty() || repwd.isEmpty() || name.isEmpty()){
+                Toast.makeText(this,"누락이 존재합니다" , Toast.LENGTH_SHORT).show()
+            }else {
                 joinStart(email, name, pwd)
             }
         }

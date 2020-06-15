@@ -39,6 +39,10 @@ class LoginActivity : AppCompatActivity(){
     }
 
     private fun loginApp(email:String, pwd:String){
+        if(email.isEmpty() || pwd.isEmpty()) {
+            Toast.makeText(this, "누락이 존재합니다", Toast.LENGTH_SHORT).show()
+            return
+        }
         auth.signInWithEmailAndPassword(email, pwd).addOnCompleteListener{ task ->
             if(!task.isSuccessful){
                 try {

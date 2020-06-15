@@ -50,10 +50,6 @@ class FragmentDashboard: Fragment() {
         activity.toolbarTitleText.visibility = View.VISIBLE
         activity.toolbarBackImage.visibility = View.INVISIBLE
     }
-    override fun onStop() {
-        super.onStop()
-        articleSnapshot.remove()
-    }
 
     inner class DashboardRecyclerViewAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val database by lazy { FirebaseFirestore.getInstance()}
